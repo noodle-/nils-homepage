@@ -22,6 +22,11 @@ disableKinds = ["taxonomy", "term", "RSS"]
   author = "Nils"
   description = "CV of Nils — software test & automation engineer."
   DateFormat = "2 January 2006"
+
+  # Link-preview card. PaperMod's get-page-images falls back to this, which
+  # gets us og:image and twitter:image, and upgrades twitter:card from
+  # "summary" to "summary_large_image". Regenerate with tools\make-images.ps1.
+  images = ["og-card.png"]
   # One theme, no toggle. With defaultTheme = "light" PaperMod also drops its
   # inline theme-switch script and its prefers-color-scheme <noscript> block,
   # so the page renders identically with or without JS. Palette lives in

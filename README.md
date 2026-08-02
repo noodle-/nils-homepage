@@ -34,7 +34,16 @@ rather than quietly producing a mangled layout.
 - `assets\css\extended\custom.css` — the palette. One theme, no light/dark
   toggle. The colour variables at the top carry their contrast ratios in
   comments; keep body text at 4.5:1 or better if you change them.
-- `static\` — favicons. Regenerate rather than hand-edit if you change the mark.
+- `static\` — favicons and the link-preview card. These are **generated**, not
+  hand-edited. Re-run the script after changing the mark, title or tagline:
+
+  ```powershell
+  pwsh tools\make-images.ps1
+  ```
+
+  It writes `favicon.ico`, the two favicon PNGs, `apple-touch-icon.png` and
+  `og-card.png`, then you commit whatever changed. CI never runs it — the
+  images are committed and the build only copies them.
 
 ## Preview locally
 
