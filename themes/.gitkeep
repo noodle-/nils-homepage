@@ -1,0 +1,2 @@
+Theme is added via git submodule during setup — see README step 4:
+git submodule add https://github.com/adityatelange/hugo-PaperMod themes/PaperMod
