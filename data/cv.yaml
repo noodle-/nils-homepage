@@ -1,0 +1,43 @@
+# ---------------------------------------------------------------------------
+# CV timeline data — this is the ONLY file you edit to change the timeline.
+#
+# Dates are "YYYY-MM". Use end: present for your current role.
+# side: left | right   (work on the left, education on the right, like the ref)
+# accent: 1..5         (teal shades defined in custom.css)
+# ---------------------------------------------------------------------------
+
+pxPerYear: 150      # vertical scale: how tall one year is
+minHeight: 54       # px floor so short stints stay readable
+
+entries:
+  - title: "Software Test Engineer"
+    org: "Company D"
+    start: "2024-01"
+    end: "present"
+    side: left
+    accent: 1
+    summary: "Test automation and release verification."
+
+  - title: "RPA & Automation Engineer"
+    org: "Company C"
+    start: "2021-11"
+    end: "2023-12"
+    side: left
+    accent: 2
+    summary: "Built and maintained process-automation workflows."
+
+  - title: "Support Technician"
+    org: "Company B"
+    start: "2021-01"
+    end: "2021-10"
+    side: left
+    accent: 3
+    summary: ""
+
+  - title: "Software Engineering"
+    org: "University A"
+    start: "2015-09"
+    end: "2019-07"
+    side: right
+    accent: 4
+    summary: "BSc."

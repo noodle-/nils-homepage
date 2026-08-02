@@ -1,0 +1,84 @@
+{{- define "main" }}
+{{- $cv := hugo.Data.cv }}
+{{- $px := $cv.pxPerYear | default 150 | float }}
+{{- $minH := $cv.minHeight | default 54 | float }}
+
+{{/* ---- helper: turn "YYYY-MM" / "present" into a decimal year ---- */}}
+{{- $now := float (add (float now.Year) (div (sub (float now.Month) 1.0) 12.0)) }}
+
+{{- $decs := slice }}
+{{- range $cv.entries }}
+  {{- $p := split .start "-" }}
+  {{- $sd := add (float (index $p 0)) (div (sub (float (index $p 1)) 1.0) 12.0) }}
+  {{- $ed := $now }}
+  {{- if ne (lower .end) "present" }}
+    {{- $q := split .end "-" }}
+    {{- $ed = add (float (index $q 0)) (div (sub (float (index $q 1)) 1.0) 12.0) }}
+  {{- end }}
+  {{- $decs = $decs | append (dict "e" . "s" $sd "x" $ed) }}
+{{- end }}
+
+{{/* ---- overall range, snapped to whole years ---- */}}
+{{- $minY := 9999.0 }}{{- $maxY := 0.0 }}
+{{- range $decs }}
+  {{- if lt .s $minY }}{{ $minY = .s }}{{ end }}
+  {{- if gt .x $maxY }}{{ $maxY = .x }}{{ end }}
+{{- end }}
+{{- $lo := math.Floor $minY }}
+{{- $hi := $maxY }}
+{{- $totalH := add (mul (sub $hi $lo) $px) 28.0 }}
+
+<article class="cv">
+
+  <header class="cv-head">
+    <h1>{{ site.Title }}</h1>
+    <p class="cv-tagline">{{ site.Params.tagline }}</p>
+    {{- with site.Params.cvIntro }}<p class="cv-intro">{{ . | markdownify }}</p>{{ end }}
+  </header>
+
+  <section class="tl" style="height:{{ printf "%.0f" $totalH }}px" aria-label="Career timeline">
+
+    {{/* axis + year ticks */}}
+    <div class="tl-axis" aria-hidden="true"></div>
+    {{- $topYear := int (math.Floor $hi) }}
+    {{- $years := int (sub $topYear $lo) }}
+    {{- range $i := seq 0 $years }}
+      {{- $yr := int (sub $topYear $i) }}
+      {{- $top := mul (sub $hi (float $yr)) $px }}
+      <div class="tl-year" style="top:{{ printf "%.1f" $top }}px" aria-hidden="true"><span>{{ $yr }}</span></div>
+    {{- end }}
+
+    {{/* entry cards */}}
+    {{- range $decs }}
+      {{- $e := .e }}
+      {{- $top := mul (sub $hi .x) $px }}
+      {{- $h := mul (sub .x .s) $px }}
+      {{- if lt $h $minH }}{{ $h = $minH }}{{ end }}
+      <div class="tl-item tl-{{ $e.side | default "left" }} a{{ $e.accent | default 1 }}"
+           style="top:{{ printf "%.1f" $top }}px;height:{{ printf "%.1f" $h }}px">
+        <div class="tl-card">
+          <h2 class="tl-title">{{ $e.title }}</h2>
+          {{- with $e.org }}<p class="tl-org">{{ . }}</p>{{ end }}
+          <p class="tl-dates">
+            {{- $ss := split $e.start "-" -}}
+            {{ index $ss 1 }}/{{ index $ss 0 }} &ndash;
+            {{- if eq (lower $e.end) "present" }} present
+            {{- else }}{{ $es := split $e.end "-" }} {{ index $es 1 }}/{{ index $es 0 }}{{ end }}
+          </p>
+          {{- with $e.summary }}<p class="tl-summary">{{ . }}</p>{{ end }}
+        </div>
+      </div>
+    {{- end }}
+  </section>
+
+  {{/* plain-text fallback, also what print/screen-readers get */}}
+  <section class="cv-links">
+    {{- with site.Params.socialIcons }}
+    <ul>
+      {{- range . }}<li><a href="{{ .url }}">{{ .name }}</a></li>{{ end }}
+    </ul>
+    {{- end }}
+  </section>
+
+</article>
+{{- end }}
