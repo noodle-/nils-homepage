@@ -3,7 +3,7 @@
 # ---------------------------------------------------------------------------
 
 baseURL = "https://noodle-.github.io/nils-homepage/"
-languageCode = "en-us"
+locale = "en-us"
 title = "Nils"
 theme = "PaperMod"
 
