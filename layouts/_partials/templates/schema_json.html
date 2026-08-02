@@ -1,0 +1,54 @@
+{{- /*
+  Overrides PaperMod's schema_json.html.
+
+  The theme emits an Organization for the home page and BreadcrumbList /
+  BlogPosting for everything else. This site is one page and that page is a
+  person's CV, so the only useful markup is a Person — built from the same
+  data/cv.yaml that renders the timeline, so it can never drift from it.
+
+  Built as a map and passed through jsonify rather than templated by hand, so
+  quoting and escaping are the encoder's problem, not ours.
+*/ -}}
+{{- if .IsHome }}
+  {{- $sameAs := slice }}
+  {{- $email := "" }}
+  {{- range site.Params.socialIcons }}
+    {{- $url := trim .url " " }}
+    {{- if hasPrefix (lower $url) "mailto:" }}
+      {{- $email = strings.TrimPrefix "mailto:" $url }}
+    {{- else }}
+      {{- $sameAs = $sameAs | append $url }}
+    {{- end }}
+  {{- end }}
+
+  {{- $jobTitle := "" }}
+  {{- $worksFor := "" }}
+  {{- $alumniOf := slice }}
+  {{- range (hugo.Data.cv).entries }}
+    {{- if and (eq (lower (string .end)) "present") (not $jobTitle) }}
+      {{- $jobTitle = .title }}
+      {{- $worksFor = .org | default "" }}
+    {{- end }}
+    {{- if eq (.side | default "left") "right" }}
+      {{- with .org }}
+        {{- $alumniOf = $alumniOf | append (dict "@type" "EducationalOrganization" "name" .) }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
+
+  {{- $person := dict
+      "@context" "https://schema.org"
+      "@type" "Person"
+      "name" site.Title
+      "url" site.Home.Permalink
+      "description" (site.Params.description | plainify)
+  }}
+  {{- with site.Params.tagline }}{{ $person = merge $person (dict "jobTitle" .) }}{{ end }}
+  {{- with $jobTitle }}{{ $person = merge $person (dict "jobTitle" .) }}{{ end }}
+  {{- with $worksFor }}{{ $person = merge $person (dict "worksFor" (dict "@type" "Organization" "name" .)) }}{{ end }}
+  {{- with $alumniOf }}{{ $person = merge $person (dict "alumniOf" .) }}{{ end }}
+  {{- with $email }}{{ $person = merge $person (dict "email" .) }}{{ end }}
+  {{- with $sameAs }}{{ $person = merge $person (dict "sameAs" .) }}{{ end }}
+  {{- with site.Params.assets.apple_touch_icon }}{{ $person = merge $person (dict "image" (. | absURL)) }}{{ end }}
+<script type="application/ld+json">{{ $person | jsonify | safeJS }}</script>
+{{- end }}

@@ -1,19 +1,33 @@
 {{- define "main" }}
 {{- $cv := hugo.Data.cv }}
 {{- $px := $cv.pxPerYear | default 150 | float }}
-{{- $minH := $cv.minHeight | default 54 | float }}
+{{- $minH := $cv.minHeight | default 90 | float }}
 
 {{/* ---- helper: turn "YYYY-MM" / "present" into a decimal year ---- */}}
 {{- $now := float (add (float now.Year) (div (sub (float now.Month) 1.0) 12.0)) }}
+{{- $reMonth := `^[0-9]{4}-(0[1-9]|1[0-2])$` }}
 
 {{- $decs := slice }}
 {{- range $cv.entries }}
+  {{/* Validate before doing arithmetic — a typo here used to produce a silently
+       mangled layout (negative heights, cards stacked on top of each other)
+       instead of a failed build. */}}
+  {{- if not (findRE $reMonth (string .start)) }}
+    {{- errorf "data/cv.yaml: entry %q has start: %q — expected YYYY-MM" .title .start }}
+  {{- end }}
+  {{- if and (ne (lower (string .end)) "present") (not (findRE $reMonth (string .end))) }}
+    {{- errorf "data/cv.yaml: entry %q has end: %q — expected YYYY-MM or \"present\"" .title .end }}
+  {{- end }}
+
   {{- $p := split .start "-" }}
   {{- $sd := add (float (index $p 0)) (div (sub (float (index $p 1)) 1.0) 12.0) }}
   {{- $ed := $now }}
-  {{- if ne (lower .end) "present" }}
+  {{- if ne (lower (string .end)) "present" }}
     {{- $q := split .end "-" }}
     {{- $ed = add (float (index $q 0)) (div (sub (float (index $q 1)) 1.0) 12.0) }}
+  {{- end }}
+  {{- if lt $ed $sd }}
+    {{- errorf "data/cv.yaml: entry %q ends (%v) before it starts (%v)" .title .end .start }}
   {{- end }}
   {{- $decs = $decs | append (dict "e" . "s" $sd "x" $ed) }}
 {{- end }}
@@ -36,7 +50,7 @@
     {{- with site.Params.cvIntro }}<p class="cv-intro">{{ . | markdownify }}</p>{{ end }}
   </header>
 
-  <section class="tl" style="height:{{ printf "%.0f" $totalH }}px" aria-label="Career timeline">
+  <section class="tl" style="min-height:{{ printf "%.0f" $totalH }}px" aria-label="Career timeline">
 
     {{/* axis + year ticks */}}
     <div class="tl-axis" aria-hidden="true"></div>
@@ -61,9 +75,9 @@
           {{- with $e.org }}<p class="tl-org">{{ . }}</p>{{ end }}
           <p class="tl-dates">
             {{- $ss := split $e.start "-" -}}
-            {{ index $ss 1 }}/{{ index $ss 0 }} &ndash;
-            {{- if eq (lower $e.end) "present" }} present
-            {{- else }}{{ $es := split $e.end "-" }} {{ index $es 1 }}/{{ index $es 0 }}{{ end }}
+            <time datetime="{{ $e.start }}">{{ index $ss 1 }}/{{ index $ss 0 }}</time> &ndash;
+            {{- if eq (lower (string $e.end)) "present" }} present
+            {{- else }}{{ $es := split $e.end "-" }} <time datetime="{{ $e.end }}">{{ index $es 1 }}/{{ index $es 0 }}</time>{{ end }}
           </p>
           {{- with $e.summary }}<p class="tl-summary">{{ . }}</p>{{ end }}
         </div>
@@ -75,7 +89,7 @@
   <section class="cv-links">
     {{- with site.Params.socialIcons }}
     <ul>
-      {{- range . }}<li><a href="{{ .url }}">{{ .name }}</a></li>{{ end }}
+      {{- range . }}<li><a href="{{ .url }}" rel="me">{{ .name }}</a></li>{{ end }}
     </ul>
     {{- end }}
   </section>

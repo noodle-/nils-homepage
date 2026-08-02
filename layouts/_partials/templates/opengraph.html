@@ -1,3 +1,10 @@
+{{- /*
+  DEPRECATION SHIM — copy of PaperMod's _partials/templates/opengraph.html.
+  Sole change: site.Language.LanguageCode -> site.Language.Locale, deprecated in
+  Hugo 0.158. Diff it against the theme after every submodule bump, and delete
+  this file once upstream PaperMod carries the fix:
+      diff --strip-trailing-cr -u themes/PaperMod/layouts/_partials/templates/opengraph.html layouts/_partials/templates/opengraph.html
+*/ -}}
 <meta property="og:url" content="{{ .Permalink }}">
 
 {{- with or site.Title site.Params.title | plainify }}

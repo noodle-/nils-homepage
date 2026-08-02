@@ -1,0 +1,14 @@
+version: 2
+updates:
+  # The workflow pins actions by major tag; this catches the majors moving.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+
+  # themes/PaperMod is a submodule pinned to a commit on master. Without this
+  # it never moves, and the deprecation shims in layouts/ never get retired.
+  - package-ecosystem: "gitsubmodule"
+    directory: "/"
+    schedule:
+      interval: "monthly"

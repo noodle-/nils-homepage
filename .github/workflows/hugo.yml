@@ -1,9 +1,18 @@
-# Build Hugo site and deploy to GitHub Pages on every push to main.
+# Build the Hugo site; deploy it to GitHub Pages from main.
+#
+# Pull requests build but do not deploy, so a broken template is caught before
+# it reaches the live site rather than by a failed deploy afterwards.
 name: Deploy Hugo site to Pages
 
 on:
   push:
     branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  # The timeline's "present" bar is measured against the build date, so a site
+  # that is never rebuilt slowly falls behind. Rebuild on the 1st of the month.
+  schedule:
+    - cron: "0 5 1 * *"
   workflow_dispatch:
 
 permissions:
@@ -12,7 +21,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "pages"
+  group: "pages-${{ github.ref }}"
   cancel-in-progress: false
 
 defaults:
@@ -37,35 +46,33 @@ jobs:
         uses: actions/checkout@v6
         with:
           submodules: recursive   # pulls in the PaperMod theme
-          fetch-depth: 0          # needed for .Lastmod from git history
 
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5
 
-      - name: Cache Hugo resources
-        uses: actions/cache@v4
-        with:
-          path: |
-            resources
-            .hugo_build.lock
-          key: hugo-${{ runner.os }}-${{ env.HUGO_VERSION }}-${{ hashFiles('**/*.md', 'hugo.toml', 'assets/**') }}
-          restore-keys: |
-            hugo-${{ runner.os }}-${{ env.HUGO_VERSION }}-
-
+      # --panicOnWarning turns Hugo's deprecation warnings into build failures.
+      # The two files in layouts/ that shim removed template methods exist
+      # because of exactly those warnings — this is what tells us when a theme
+      # bump has made them redundant, or introduced new ones.
       - name: Build with Hugo
+        env:
+          BASE_URL: ${{ steps.pages.outputs.base_url }}
         run: |
           hugo \
             --gc \
             --minify \
-            --baseURL "${{ steps.pages.outputs.base_url }}/"
+            --panicOnWarning \
+            --baseURL "${BASE_URL}/"
 
       - name: Upload artifact
+        if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v4
         with:
           path: ./public
 
   deploy:
+    if: github.event_name != 'pull_request'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

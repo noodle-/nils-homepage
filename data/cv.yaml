@@ -7,7 +7,8 @@
 # ---------------------------------------------------------------------------
 
 pxPerYear: 150      # vertical scale: how tall one year is
-minHeight: 54       # px floor so short stints stay readable
+minHeight: 90       # px floor so short stints stay readable — roughly what a
+                    # title + employer + dates needs at the default font size
 
 entries:
   - title: "Software Test Engineer"

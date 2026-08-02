@@ -1,26 +1,32 @@
 /* nils-homepage — teal accent + CV timeline ------------------------------ */
 
+/* One palette, no light/dark switch — see defaultTheme in hugo.toml.
+   Softened from PaperMod's defaults: paper-white instead of #fff, near-black
+   instead of black, and a teal ramp pulled back off the neon end. Every text
+   colour below clears WCAG AA (4.5:1) against the surface it sits on. */
 :root {
-  --accent:       #0d9488;
-  --accent-hover: #0f766e;
-  --a1: #0f766e;   /* teal 700 */
-  --a2: #0d9488;   /* teal 600 */
-  --a3: #14b8a6;   /* teal 500 */
-  --a4: #2dd4bf;   /* teal 400 */
-  --a5: #5eead4;   /* teal 300 */
-  --card-ink: #ffffff;
-  --axis: rgba(0,0,0,.14);
-}
-.dark {
-  --accent:       #2dd4bf;
-  --accent-hover: #5eead4;
-  --a1: #115e59;
-  --a2: #0f766e;
-  --a3: #0d9488;
-  --a4: #14b8a6;
-  --a5: #2dd4bf;
-  --card-ink: #f0fdfa;
-  --axis: rgba(255,255,255,.18);
+  /* PaperMod's own variables */
+  --theme:     #faf9f7;   /* page — warm off-white, not stark white */
+  --entry:     #ffffff;
+  --primary:   #2a2d31;   /* headings   — 12.9:1 on --theme */
+  --content:   #383c41;   /* body text  — 10.1:1 */
+  --secondary: #666c72;   /* muted text —  5.2:1 */
+  --tertiary:  #e8e5e0;
+  --border:    #e2dfd9;
+  --code-bg:   #f1efeb;
+  --code-block-bg: #24272b;
+
+  /* CV timeline */
+  --accent:       #0c6f68;   /* links — 5.8:1 on --theme */
+  --accent-hover: #0a5b55;
+  --a1: #0b4f4a;
+  --a2: #0f6b64;
+  --a3: #0e837a;             /* darkest shade still safe for white text */
+  --a4: #4fb3a6;             /* from here down, dark ink */
+  --a5: #8fcfc5;
+  --card-ink:      #ffffff;  /* on a1–a3: 4.7:1 or better */
+  --card-ink-dark: #04302c;  /* on a4–a5: 5.7:1 or better */
+  --axis: rgba(0,0,0,.18);
 }
 
 .post-content a { color: var(--accent); box-shadow: 0 1px 0 var(--accent); }
@@ -53,16 +59,22 @@
 .tl-left  { left: 0; }
 .tl-right { right: 0; }
 
+/* min-height, not height: the slot is sized from the dates, but if the text
+   needs more room (large default font size, long role title) the card grows
+   instead of silently cutting the content off. z-index keeps a grown card
+   painting over its neighbour rather than blending into it. */
 .tl-card {
-  height: 100%; box-sizing: border-box;
+  min-height: 100%; box-sizing: border-box;
+  position: relative; z-index: 1;
   border-radius: 10px; padding: .85rem 1rem;
-  color: var(--card-ink); overflow: hidden;
+  color: var(--card-ink);
   display: flex; flex-direction: column;
   transition: transform .15s ease, box-shadow .15s ease;
 }
 .tl-item:hover .tl-card {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(0,0,0,.18);
+  z-index: 2;
 }
 
 .a1 .tl-card { background: var(--a1); }
@@ -71,7 +83,7 @@
 .a4 .tl-card { background: var(--a4); }
 .a5 .tl-card { background: var(--a5); }
 /* lighter shades need dark text for contrast */
-.a4 .tl-card, .a5 .tl-card { color: #04302c; }
+.a4 .tl-card, .a5 .tl-card { color: var(--card-ink-dark); }
 
 .tl-title   { font-size: 1rem; margin: 0; line-height: 1.25; font-weight: 650; }
 .tl-org     { margin: .15rem 0 0; font-size: .9rem; opacity: .85; }
@@ -94,8 +106,12 @@
 }
 .cv-links a { color: var(--accent); text-transform: capitalize; }
 
-/* ---------- mobile: single column, axis to the left ---------- */
-@media (max-width: 700px) {
+/* ---------- single column: narrow screens, and large default font sizes ----
+   The breakpoint is in em on purpose. em media queries scale with the reader's
+   browser font-size setting, so someone running 24px text drops to the roomier
+   one-column layout on a desktop too, instead of squeezing into half-width
+   columns sized for 16px. */
+@media (max-width: 44em) {
   .tl-axis { left: 8px; }
   .tl-year { left: 8px; transform: translate(-50%, -50%); font-size: .7rem; }
   .tl-item, .tl-left, .tl-right {
@@ -109,8 +125,17 @@
   .tl-item:hover .tl-card { transform: none; }
 }
 
-/* ---------- print ---------- */
+/* ---------- print ----------
+   Browsers drop background colours when printing unless told otherwise, which
+   would leave white card text on white paper. This is a CV — it has to print. */
 @media print {
-  .tl-card { box-shadow: none; }
-  header.header, footer.footer { display: none; }
+  :root { --axis: rgba(0,0,0,.35); }
+  .tl-card {
+    box-shadow: none;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+  .tl-item { break-inside: avoid; }
+  .tl-item:hover .tl-card { transform: none; box-shadow: none; }
+  header.header, footer.footer, .top-link { display: none !important; }
 }

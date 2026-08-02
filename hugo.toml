@@ -3,13 +3,15 @@
 # ---------------------------------------------------------------------------
 
 baseURL = "https://noodle-.github.io/nils-homepage/"
-locale = "en-us"
+locale = "en-US"          # RFC 5646 casing — feeds og:locale as "en_US"
 title = "Nils"
 theme = "PaperMod"
 
 enableRobotsTXT = true
-enableEmoji = true
-pygmentsUseClasses = true
+
+# One page, no taxonomies, no feed. Keeps /tags/ and /categories/ out of the
+# sitemap and stops an empty index.xml being advertised in <head>.
+disableKinds = ["taxonomy", "term", "RSS"]
 
 [minify]
   disableXML = true
@@ -20,23 +22,30 @@ pygmentsUseClasses = true
   author = "Nils"
   description = "CV of Nils — software test & automation engineer."
   DateFormat = "2 January 2006"
-  defaultTheme = "auto"
-  disableThemeToggle = false
+  # One theme, no toggle. With defaultTheme = "light" PaperMod also drops its
+  # inline theme-switch script and its prefers-color-scheme <noscript> block,
+  # so the page renders identically with or without JS. Palette lives in
+  # assets/css/extended/custom.css.
+  defaultTheme = "light"
+  disableThemeToggle = true
 
   tagline = "Software test & automation engineer"
   cvIntro = ""
 
-  ShowBreadCrumbs = false
-  ShowReadingTime = false
-  ShowPostNavLinks = false
   hideFooter = false
 
   [params.assets]
-    disableHLJS = true
     disableFingerprinting = false
     favicon = "favicon.ico"
+    favicon16x16 = "favicon-16x16.png"
+    favicon32x32 = "favicon-32x32.png"
+    apple_touch_icon = "apple-touch-icon.png"
+    safari_pinned_tab = "safari-pinned-tab.svg"
+    theme_color = "#0d9488"
+    msapplication_TileColor = "#0d9488"
 
-  # Shown as text links at the bottom of the CV.
+  # Rendered as text links at the bottom of the CV, and as schema.org sameAs.
+  # TODO: replace the placeholder mailto before sharing this.
   [[params.socialIcons]]
     name = "github"
     url = "https://github.com/noodle-"

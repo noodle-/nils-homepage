@@ -1,3 +1,10 @@
+{{- /*
+  DEPRECATION SHIM — copy of themes/PaperMod/layouts/baseof.html.
+  Sole change: .Language.LanguageDirection -> .Language.Direction, removed in
+  Hugo 0.158. Diff it against the theme after every submodule bump, and delete
+  this file once upstream PaperMod carries the fix:
+      diff --strip-trailing-cr -u themes/PaperMod/layouts/baseof.html layouts/baseof.html
+*/ -}}
 {{- if lt hugo.Version "0.146.0" }}
 {{- errorf "=> hugo v0.146.0 or greater is required for hugo-PaperMod to build " }}
 {{- end -}}

@@ -6,3 +6,6 @@
 # OS / editor cruft
 .DS_Store
 Thumbs.db
+
+# Local tooling — launch.json holds an absolute path to this machine's hugo.exe
+.claude/
