@@ -13,9 +13,13 @@ on:
   # that is never rebuilt slowly falls behind. Rebuild every Monday. GitHub
   # disables scheduled workflows after 60 days without repo activity, and a
   # weekly cadence makes that far less likely to bite than a monthly one.
-  # Times are UTC — GitHub ignores the TZ set on the build job below.
+  #
+  # 03:00 UTC is 05:00 in Oslo under CEST (late March to late October) and
+  # 04:00 under CET. GitHub accepts only UTC here and ignores the TZ set on
+  # the build job below, so one cron cannot follow DST; this picks the offset
+  # that is correct for the longer, summer half of the year.
   schedule:
-    - cron: "0 5 * * 1"
+    - cron: "0 3 * * 1"
   workflow_dispatch:
 
 permissions:
