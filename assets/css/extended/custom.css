@@ -3,7 +3,8 @@
 /* One palette, no light/dark switch — see defaultTheme in hugo.toml.
    Softened from PaperMod's defaults: paper-white instead of #fff, near-black
    instead of black, and a teal ramp pulled back off the neon end. Every text
-   colour below clears WCAG AA (4.5:1) against the surface it sits on. */
+   colour below clears WCAG AA (4.5:1) against the surface it sits on —
+   verified in-browser against the rendered page, worst case 4.55:1. */
 :root {
   /* PaperMod's own variables */
   --theme:     #faf9f7;   /* page — warm off-white, not stark white */
@@ -16,16 +17,23 @@
   --code-bg:   #f1efeb;
   --code-block-bg: #24272b;
 
-  /* CV timeline */
-  --accent:       #0c6f68;   /* links — 5.8:1 on --theme */
+  /* CV timeline — muted teal ramp. Measured against the rendered page, not
+     estimated: every card ratio below is the browser's own computed colour
+     put through the WCAG formula, including the --card-dim alpha. */
+  --accent:       #0c6f68;   /* links — 5.7:1 on --theme */
   --accent-hover: #0a5b55;
-  --a1: #0b4f4a;
-  --a2: #0f6b64;
-  --a3: #0e837a;             /* darkest shade still safe for white text */
-  --a4: #4fb3a6;             /* from here down, dark ink */
-  --a5: #8fcfc5;
-  --card-ink:      #ffffff;  /* on a1–a3: 4.7:1 or better */
-  --card-ink-dark: #04302c;  /* on a4–a5: 5.7:1 or better */
+  --a1: #2b524e;             /* white ink — 8.7:1 */
+  --a2: #356661;             /* white ink — 6.5:1 */
+  --a3: #3d7169;             /* white ink — 5.6:1, lightest that still takes it */
+  --a4: #a8c9c4;             /* from here down, dark ink — 7.9:1 */
+  --a5: #cadedb;             /* dark ink — 10.0:1 */
+  --card-ink:      #ffffff;
+  --card-ink-dark: #16302d;
+  /* Secondary card text is dimmed with alpha, so its real contrast is the
+     blend against the card, not the ink's own ratio. 0.85 is the floor that
+     keeps the worst case (dates on --a3) at 4.55:1. Lower it and that line
+     drops below AA. */
+  --card-dim: .85;
   --axis: rgba(0,0,0,.18);
 }
 
@@ -85,11 +93,19 @@
 /* lighter shades need dark text for contrast */
 .a4 .tl-card, .a5 .tl-card { color: var(--card-ink-dark); }
 
-.tl-title   { font-size: 1rem; margin: 0; line-height: 1.25; font-weight: 650; }
-.tl-org     { margin: .15rem 0 0; font-size: .9rem; opacity: .85; }
-.tl-dates   { margin: .3rem 0 0; font-size: .75rem; opacity: .75;
+/* color: inherit is load-bearing. .tl-title is an <h2>, and PaperMod styles
+   headings with `color: var(--primary)` — a direct rule, which beats the card
+   ink arriving by inheritance. Without this the titles render near-black on
+   the dark cards: 1.47:1 on --a1, effectively unreadable. */
+.tl-title   { font-size: 1rem; margin: 0; line-height: 1.25; font-weight: 650;
+              color: inherit; }
+.tl-org     { margin: .15rem 0 0; font-size: .9rem; }
+.tl-dates   { margin: .3rem 0 0; font-size: .75rem;
               font-variant-numeric: tabular-nums; }
-.tl-summary { margin: .5rem 0 0; font-size: .82rem; opacity: .9; }
+.tl-summary { margin: .5rem 0 0; font-size: .82rem; }
+/* One dim level, not three. Hierarchy comes from size and weight above; the
+   old .75 on dates was the main AA failure among the secondary lines. */
+.tl-org, .tl-dates, .tl-summary { opacity: var(--card-dim); }
 
 /* connector nub to the axis */
 .tl-item::after {
