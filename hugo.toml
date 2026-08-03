@@ -50,12 +50,21 @@ disableKinds = ["taxonomy", "term", "RSS"]
     msapplication_TileColor = "#0d9488"
 
   # Rendered as text links at the bottom of the CV, and as schema.org sameAs.
-  # TODO: replace the placeholder mailto before sharing this.
+  #
+  # `name` is the visible label, not a PaperMod icon key: layouts/index.html
+  # renders these as text rather than calling the theme's social_icons partial,
+  # so brand casing is safe here and cannot break an icon lookup.
+  #
+  # No email entry on purpose. A mailto on a public page gets harvested, and
+  # the dedicated address for this is not set up yet — GitHub and LinkedIn are
+  # the contact routes until it is. schema_json.html derives its `email` field
+  # from a mailto: entry here, so omitting one drops the address from the
+  # structured data too, rather than publishing one that does not work.
   [[params.socialIcons]]
-    name = "github"
+    name = "GitHub"
     url = "https://github.com/noodle-"
   [[params.socialIcons]]
-    name = "email"
-    url = "mailto:you@example.com"
+    name = "LinkedIn"
+    url = "https://www.linkedin.com/in/nils-b%C3%BCnger/"
 
 # No nav menu — it's a one-pager.
