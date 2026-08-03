@@ -74,4 +74,6 @@ check instead of a failed deploy.
   rather than asserted. A theme bump that reintroduces a deprecation fails the
   build.
 - The timeline measures "present" against the build date, so the workflow also
-  runs monthly on a schedule to keep the current role's bar honest.
+  runs weekly on a schedule to keep the current role's bar honest — Mondays at
+  05:00 Oslo time, 04:00 outside summer time. GitHub's cron only speaks UTC, so
+  the one-hour winter drift is unavoidable and harmless.
