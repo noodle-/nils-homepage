@@ -74,4 +74,4 @@ check instead of a failed deploy.
   rather than asserted. A theme bump that reintroduces a deprecation fails the
   build.
 - The timeline measures "present" against the build date, so the workflow also
-  runs monthly on a schedule to keep the current role's bar honest.
+  runs weekly on a schedule (Mondays) to keep the current role's bar honest.

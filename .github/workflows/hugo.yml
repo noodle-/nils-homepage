@@ -10,9 +10,12 @@ on:
   pull_request:
     branches: ["main"]
   # The timeline's "present" bar is measured against the build date, so a site
-  # that is never rebuilt slowly falls behind. Rebuild on the 1st of the month.
+  # that is never rebuilt slowly falls behind. Rebuild every Monday. GitHub
+  # disables scheduled workflows after 60 days without repo activity, and a
+  # weekly cadence makes that far less likely to bite than a monthly one.
+  # Times are UTC — GitHub ignores the TZ set on the build job below.
   schedule:
-    - cron: "0 5 1 * *"
+    - cron: "0 5 * * 1"
   workflow_dispatch:
 
 permissions:
